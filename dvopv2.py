@@ -221,7 +221,7 @@ def id2epoch_data(catid, objid, system='psf', mformat='calibrated',
 
     # sky background flux
     sky = np.abs(data['SKY_FLUX'])
-    exp = 10.**(test['M_TIME'] / 2.5)
+    exp = 10.**(data['M_TIME'] / 2.5)
 
     if tformat == 'julian':
         epoch = (data['TIME'] / 86400.0) + 2440587.5
