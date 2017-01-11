@@ -219,9 +219,10 @@ def id2epoch_data(catid, objid, system='psf', mformat='calibrated',
         phot = (phot - 25.0 + clam_data * 0.001 +
                 Kcorr_data * (airmass - 1.0) - mcal)
 
-    # sky background flux
+    # sky background flux, exposure time and db_flag
     sky = np.abs(data['SKY_FLUX'])
     exp = 10.**(data['M_TIME'] / 2.5)
+    db_flag = data['DB_FLAGS']
 
     if tformat == 'julian':
         epoch = (data['TIME'] / 86400.0) + 2440587.5
@@ -236,9 +237,9 @@ def id2epoch_data(catid, objid, system='psf', mformat='calibrated',
         mask = [(photcode >= 10000 + i * 100) & (photcode < 10100 + i * 100)
                 for i in range(5)]
         return [(ra[i], dec[i], phot[i], photerr[i], photcode[i], epoch[i],
-                sky[i], exp[i]) for i in mask]
+                sky[i], exp[i], db_flag[i]) for i in mask]
     else:
-        return phot, photerr, photcode, epoch, sky, exp
+        return phot, photerr, photcode, epoch, sky, exp, db_flag
 
 
 def id2astro(catid, objid):
