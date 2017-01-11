@@ -171,7 +171,8 @@ def id2avgphot(catid, objid, system='psf', allfilter=False):
     return phot, photerr
 
 
-def id2epoch_data(catid, objid, system='psf', tformat='unix', grouped=False):
+def id2epoch_data(catid, objid, system='psf', mformat='calibrated',
+    tformat='unix', grouped=False):
 
     # Take in CATID and OBJID, return individual epoch and photometry
     # The sum in quadrature of 0.015 mag is to include systematics
@@ -203,18 +204,24 @@ def id2epoch_data(catid, objid, system='psf', tformat='unix', grouped=False):
         phot = data['MAG_AP']
         photerr = np.sqrt(data['MAG_AP_ERR']**2.0 + 0.015**2.0)
 
-    airmass = data['AIRMASS']
-    mcal = data['M_CAL']
-    photcode = data['PHOTCODE']
-    epoch = data['TIME']
+    if mformat != 'instrumental':
+        # calibrated magnitude
+        airmass = data['AIRMASS']
+        mcal = data['M_CAL']
+        photcode = data['PHOTCODE']
+        epoch = data['TIME']
 
-    photcode_pos = np.array([np.where(i == code)[0][0] for i in photcode])
-    clam_data = clam[photcode_pos]
-    Kcorr_data = Kcorr[photcode_pos]
+        photcode_pos = np.array([np.where(i == code)[0][0] for i in photcode])
+        clam_data = clam[photcode_pos]
+        Kcorr_data = Kcorr[photcode_pos]
 
-    # Instrumental zero-point correction
-    phot = (phot - 25.0 + clam_data * 0.001 +
-            Kcorr_data * (airmass - 1.0) - mcal)
+        # Instrumental zero-point correction
+        phot = (phot - 25.0 + clam_data * 0.001 +
+                Kcorr_data * (airmass - 1.0) - mcal)
+
+    # sky background flux
+    sky = np.abs(data['SKY_FLUX'])
+    exp = 10.**(test['M_TIME'] / 2.5)
 
     if tformat == 'julian':
         epoch = (data['TIME'] / 86400.0) + 2440587.5
@@ -228,10 +235,10 @@ def id2epoch_data(catid, objid, system='psf', tformat='unix', grouped=False):
     if grouped:
         mask = [(photcode >= 10000 + i * 100) & (photcode < 10100 + i * 100)
                 for i in range(5)]
-        return [(ra[i], dec[i], phot[i], photerr[i], photcode[i], epoch[i])
-                for i in mask]
+        return [(ra[i], dec[i], phot[i], photerr[i], photcode[i], epoch[i],
+                sky[i], exp[i]) for i in mask]
     else:
-        return phot, photerr, photcode, epoch
+        return phot, photerr, photcode, epoch, sky, exp
 
 
 def id2astro(catid, objid):
