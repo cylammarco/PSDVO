@@ -38,6 +38,8 @@ PV2url = "http://dvodist.ipp.ifa.hawaii.edu/3pi.pv2.20141212/"
 # Set your storage folder, $HOME by default
 storagepath = path.expanduser("~/PV2")
 # storagepath = "MANUAL PATH HERE"
+if not path.isfile(storagepath):
+    subprocess.call('mkdir ' + storagepath, shell='True')
 
 # RA, Dec need to be at double quadruple precision
 rmin = skytable['R_MIN'].astype('float64')
@@ -73,8 +75,6 @@ def PV2download(filename, filetype):
     subprocess.call('wget ' + PV2url + filename + '.' + filetype + ' -O ' +
                     storagepath + '/' + filename[6:] + '.' + filetype,
                     shell=True)
-    subprocess.call(folderpath + '/cfitsio/funpack -F ' + storagepath + '/' +
-                    filename[6:] + '.' + filetype, shell=True)
 
 
 def pos2catid(ra, dec):
