@@ -34,7 +34,7 @@ photcode = np.array(pyfits.getdata(folderpath + '/PV3/Photcodes.dat'))
 PV3url = "http://dvodist.ipp.ifa.hawaii.edu/3pi.pv3.20160422/"
 
 # Set your storage folder, $HOME by default
-storagepath = path.expanduser("~/PV2")
+storagepath = path.expanduser("~/PV3")
 # storagepath = "MANUAL PATH HERE"
 if not path.isfile(storagepath):
     subprocess.call('mkdir ' + storagepath, shell='True')
