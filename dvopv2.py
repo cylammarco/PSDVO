@@ -204,12 +204,12 @@ def id2epoch_data(catid, objid, system='psf', mformat='calibrated',
         phot = data['MAG_AP']
         photerr = np.sqrt(data['MAG_AP_ERR']**2.0 + 0.015**2.0)
 
+    photcode = data['PHOTCODE']
+    epoch = data['TIME']
     if mformat != 'instrumental':
         # calibrated magnitude
         airmass = data['AIRMASS']
         mcal = data['M_CAL']
-        photcode = data['PHOTCODE']
-        epoch = data['TIME']
 
         photcode_pos = np.array([np.where(i == code)[0][0] for i in photcode])
         clam_data = clam[photcode_pos]
@@ -239,7 +239,7 @@ def id2epoch_data(catid, objid, system='psf', mformat='calibrated',
         return [(ra[i], dec[i], phot[i], photerr[i], photcode[i], epoch[i],
                 sky[i], exp[i], db_flag[i]) for i in mask]
     else:
-        return phot, photerr, photcode, epoch, sky, exp, db_flag
+        return ra, dec, phot, photerr, photcode, epoch, sky, exp, db_flag
 
 
 def id2astro(catid, objid):
