@@ -1,5 +1,8 @@
 import numpy as np
 import pyfits
+import subprocess
+from inspect import getfile, currentframe
+from os import path
 
 '''
 
@@ -26,10 +29,15 @@ Last updated 19th Oct 2016
 
 '''
 
-folderpath = '/disk8/mlam/lap.pv2.20141215/'
+folderpath = path.dirname(path.abspath(getfile(currentframe())))
 
-skytable = np.array(pyfits.getdata(folderpath+'SkyTable.fits'))
-photcode = np.array(pyfits.getdata(folderpath+'Photcodes.dat'))
+skytable = np.array(pyfits.getdata(folderpath + '/PV2/SkyTable.fits'))
+photcode = np.array(pyfits.getdata(folderpath + '/PV2/Photcodes.dat'))
+PV2url = "http://dvodist.ipp.ifa.hawaii.edu/3pi.pv2.20141212/"
+
+# Set your storage folder, $HOME by default
+storagepath = path.expanduser("~/PV2")
+# storagepath = "MANUAL PATH HERE"
 
 # RA, Dec need to be at double quadruple precision
 rmin = skytable['R_MIN'].astype('float64')
@@ -59,6 +67,14 @@ def _greatcirdist(ra1, dec1, ra_list, dec_list):
                       np.cos(dec1) * np.cos(dec2) * np.cos(ra1 - ra2)))
 
     return np.degrees(dist)*3600.
+
+
+def PV2download(filename, filetype):
+    subprocess.call('wget ' + PV2url + filename + '.' + filetype + ' -O ' +
+                    storagepath + '/' + filename[6:] + '.' + filetype,
+                    shell=True)
+    subprocess.call(folderpath + '/cfitsio/funpack -F ' + storagepath + '/' +
+                    filename[6:] + '.' + filetype, shell=True)
 
 
 def pos2catid(ra, dec):
@@ -98,16 +114,20 @@ def catid2name(catid):
 
 def ffile(filename, filetype):
     # Return the original FITS file
-
-    fitsfile = pyfits.open(folderpath + filename + '.' + filetype)
+    if not path.isfile(storagepath + '/' + filename[6:] + '.' + filetype):
+        PV2download(filename, filetype)
+    fitsfile = pyfits.open(storagepath + '/' + filename[6:] + '.' + filetype)
 
     return fitsfile
 
 
 def fheader(filename, filetype):
     # Return the FITS table header
+    if not path.isfile(storagepath + '/' + filename[6:] + '.' + filetype):
+        PV2download(filename, filetype)
 
-    fitsheader = pyfits.open(folderpath + filename + '.' + filetype)[1].header
+    fitsheader = pyfits.open(storagepath + '/' + filename[6:] + '.' +
+                             filetype)[1].header
 
     return fitsheader
 
@@ -117,8 +137,11 @@ def ftable(filename, filetype, nparray=True):
     # cpm and cpt files have conflicted headers, so the names have to be
     # changed before data can be loaded
     # nparray if False return the FITS table format
+    if not path.isfile(storagepath + '/' + filename[6:] + '.' + filetype):
+        PV2download(filename, filetype)
 
-    fitstable = pyfits.open(folderpath + filename + '.' + filetype)[1]
+    fitstable = pyfits.open(storagepath + '/' + filename[6:] + '.' +
+                            filetype)[1]
 
     if filetype == 'cpm':
         fitstable.header['TTYPE44'] += '_1'
@@ -172,7 +195,7 @@ def id2avgphot(catid, objid, system='psf', allfilter=False):
 
 
 def id2epoch_data(catid, objid, system='psf', mformat='calibrated',
-    tformat='unix', grouped=False):
+                  tformat='unix', grouped=False):
 
     # Take in CATID and OBJID, return individual epoch and photometry
     # The sum in quadrature of 0.015 mag is to include systematics
