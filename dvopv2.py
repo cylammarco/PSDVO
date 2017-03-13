@@ -30,19 +30,19 @@ Last updated 13th Feb 2017
 '''
 
 # Get the folder path of this script
-folderpath = path.dirname(path.abspath(getfile(currentframe())))
+pv2folderpath = path.dirname(path.abspath(getfile(currentframe())))
 
 # Open the sky cell tessellation table and photcode table
-skytable = np.array(pyfits.getdata(folderpath + '/PV2/SkyTable.fits'))
-photcode = np.array(pyfits.getdata(folderpath + '/PV2/Photcodes.dat'))
+pv2skytable = np.array(pyfits.getdata(folderpath + '/PV2/SkyTable.fits'))
+pv2photcode = np.array(pyfits.getdata(folderpath + '/PV2/Photcodes.dat'))
 
 # Set your storage folder, $HOME by default
-storagepath = path.expanduser("~/PV2")
+pv2storagepath = path.expanduser("~/PV2")
 # storagepath = "MANUAL PATH HERE"
-if not path.exists(storagepath):
-    subprocess.call('mkdir ' + storagepath, shell='True')
+if not path.exists(pv2storagepath):
+    subprocess.call('mkdir ' + pv2storagepath, shell='True')
 
 # Define the download path if file does not exist locallyin the storagepath
-PVurl = "http://dvodist.ipp.ifa.hawaii.edu/3pi.pv2.20141215/"
+pv2url = "http://dvodist.ipp.ifa.hawaii.edu/3pi.pv2.20141215/"
 
-dvopv2 = DvoFunctions(skytable, photcode, PVurl, folderpath, storagepath)
+dvopv2 = DvoFunctions(pv2skytable, pv2photcode, pv2url, pv2folderpath, pv2storagepath)
