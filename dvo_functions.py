@@ -32,7 +32,7 @@ Last updated 15th March 2017
 
 class DvoFunctions(object):
 
-    def __init__(self, skytable, photcode, PVurl, folderpath, storagepath):
+    def __init__(self, version):
         '''
 
         Initialize the parameters of a DvoFunctions object.
@@ -56,6 +56,30 @@ class DvoFunctions(object):
                 total absorption)
 
         '''
+        # Define the download path if file does not exist locally in the
+        # storagepath
+        if version == 2:
+            PVurl = "http://dvodist.ipp.ifa.hawaii.edu/3pi.pv2.20141215/"
+        elif version == 3:
+            PVurl = "http://dvodist.ipp.ifa.hawaii.edu/3pi.pv3.20160422/"
+        else:
+            print "Required version not available"
+            return None
+
+        # Get the folder path of this script
+        folderpath = path.dirname(path.abspath(getfile(currentframe())))
+
+        # Open the sky cell tessellation table and photcode table
+        skytable = np.array(pyfits.getdata(folderpath + '/PV' +
+                              ("%d" % version) + '/SkyTable.fits'))
+        photcode = np.array(pyfits.getdata(folderpath + '/PV' +
+                              ("%d" % version) + '/Photcodes.dat'))
+
+        # Set your storage folder, $HOME by default
+        storagepath = path.expanduser('~/PV%d' % version)
+        # storagepath = "MANUAL PATH HERE"
+        if not path.exists(storagepath):
+            subprocess.call('mkdir ' + storagepath, shell='True')
 
         self.skytable = skytable
         self.photcode = photcode
@@ -74,44 +98,6 @@ class DvoFunctions(object):
         self.code = photcode['CODE']
         self.clam = photcode['C_LAM']
         self.Kcorr = photcode['K']
-
-    @classmethod
-    def set_version(cls, version):
-        '''
-
-        Initialize a DvoFunctions object.
-
-        Input::
-        version - integer 2 or 3
-
-        '''
-
-        # Get the folder path of this script
-        pvfolderpath = path.dirname(path.abspath(getfile(currentframe())))
-
-        # Open the sky cell tessellation table and photcode table
-        pvskytable = np.array(pyfits.getdata(pvfolderpath + '/PV' +
-                              ("%d" % version) + '/SkyTable.fits'))
-        pvphotcode = np.array(pyfits.getdata(pvfolderpath + '/PV' +
-                              ("%d" % version) + '/Photcodes.dat'))
-
-        # Set your storage folder, $HOME by default
-        pvstoragepath = path.expanduser('~/PV%d' % version)
-        # storagepath = "MANUAL PATH HERE"
-        if not path.exists(pvstoragepath):
-            subprocess.call('mkdir ' + pvstoragepath, shell='True')
-
-        # Define the download path if file does not exist locally in the
-        # storagepath
-        if version == 2:
-            pvurl = "http://dvodist.ipp.ifa.hawaii.edu/3pi.pv2.20141215/"
-        elif version == 3:
-            pvurl = "http://dvodist.ipp.ifa.hawaii.edu/3pi.pv3.20160422/"
-        else:
-            print "Required version not available"
-            return None
-
-        return cls(pvskytable, pvphotcode, pvurl, pvfolderpath, pvstoragepath)
 
     def _great_circle_distance(self, ra1, dec1, ra_list, dec_list):
         '''

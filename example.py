@@ -1,9 +1,9 @@
 from dvo_functions import *
 
 # Initialising the DvoFunctions object
-pv2 = DvoFunctions.set_version(2)
+pv2 = DvoFunctions(2)
 print 'Created an object pv2 initialised by DvoFunctions.set_version(2)'
-pv3 = DvoFunctions.set_version(3)
+pv3 = DvoFunctions(3)
 print 'Created an object pv3 initialised by DvoFunctions.set_version(3)'
 
 # an M7 dwarf
