@@ -20,7 +20,7 @@ list_of_catid_1 = pv2.position_to_catid(ra, dec, system='equatorial')
 list_of_catid_2 = pv2.position_to_catid(l, b, system='galactic')
 if list_of_catid_1 != list_of_catid_2:
     print ('Searching with equatorial and galactic cooridinates of the same '
-        'position return different list of catalogue ID!')
+           'position return different list of catalogue ID!')
 
 print 'pv2.position_to_catid(' + str(ra) + ', ' + str(dec) + ') returns:'
 print list_of_catid_1
@@ -34,7 +34,7 @@ list_of_filename_1 = pv2.position_to_filename(ra, dec, system='equatorial')
 list_of_filename_2 = pv2.position_to_filename(l, b, system='galactic')
 if list_of_filename_1 != list_of_filename_2:
     print ('Searching with equatorial and galactic cooridinates of the same '
-        'position return different list of file!')
+           'position return different list of file!')
 
 print 'pv2.position_to_filename(' + str(ra) + ', ' + str(dec) + ') returns:'
 print list_of_filename_1
@@ -105,7 +105,7 @@ print ''
 #
 # Searching all ojbects within the radius from the given list of positions in
 # equatorial coordinates
-#        
+#
 list_of_catid, list_of_objid, list_of_angular_distance, list_of_filename =\
     pv2.search_objects_in_radius(ra, dec, radius=5.)
 if len(list_of_objid) != len(list_of_angular_distance):
@@ -137,8 +137,8 @@ print ''
 # Return some selected epoch-wise measurments
 #
 epoch = pv2.catid_objid_to_epoch_data(catid, objid, system='psf',
-                                  mformat='calibrated', tformat='unix',
-                                  grouped=False)
+                                      mformat='calibrated', tformat='unix',
+                                      grouped=False)
 print 'pv2.catid_objid_to_epoch_data(' + str(catid) + ', ' + str(objid) +\
       ', system=\'psf\', mformat=\'calibrated\', tformat=\'unix\', ' +\
       'grouped=False) returns:'

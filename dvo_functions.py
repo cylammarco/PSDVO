@@ -71,9 +71,9 @@ class DvoFunctions(object):
 
         # Open the sky cell tessellation table and photcode table
         skytable = np.array(pyfits.getdata(folderpath + '/PV' +
-                              ("%d" % version) + '/SkyTable.fits'))
+                            ("%d" % version) + '/SkyTable.fits'))
         photcode = np.array(pyfits.getdata(folderpath + '/PV' +
-                              ("%d" % version) + '/Photcodes.dat'))
+                            ("%d" % version) + '/Photcodes.dat'))
 
         # Set your storage folder, $HOME by default
         storagepath = path.expanduser('~/PV%d' % version)
@@ -161,8 +161,8 @@ class DvoFunctions(object):
         # pa = radians(123.0-90.0)
 
         ra = (np.arctan2((np.cos(b) * np.cos(l - pa)),
-                         (np.sin(b) * np.cos(p_dec) - np.cos(b) * np.sin(p_dec) *
-                          np.sin(l - pa))) + p_ra)
+              (np.sin(b) * np.cos(p_dec) - np.cos(b) * np.sin(p_dec) *
+              np.sin(l - pa))) + p_ra)
         dec = np.arcsin(np.cos(b) * np.cos(p_dec) * np.sin(l - pa) +
                         np.sin(b) * np.sin(p_dec))
 
@@ -198,12 +198,12 @@ class DvoFunctions(object):
         # Uncompress file, -F means writing over the compressed file
         if platform == "darwin":
             subprocess.call(self.folderpath + '/cfitsio_mac/funpack -F ' +
-                        self.storagepath + '/' + filename[6:] + '.' +
-                        filetype, shell=True)
+                            self.storagepath + '/' + filename[6:] + '.' +
+                            filetype, shell=True)
         else:
             subprocess.call(self.folderpath + '/cfitsio/funpack -F ' +
-                        self.storagepath + '/' + filename[6:] + '.' +
-                        filetype, shell=True)
+                            self.storagepath + '/' + filename[6:] + '.' +
+                            filetype, shell=True)
 
     def position_to_catid(self, x, y, system='equatorial'):
         '''
