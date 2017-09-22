@@ -1,3 +1,5 @@
+import subprocess
+from os import path
 import urllib2
 from matplotlib.pyplot import *
 from dvo_functions import DvoFunctions
@@ -7,12 +9,12 @@ dec_list = np.array([ 18.86069691,  18.84046616,  15.43084874])
 
 class postage_stamp(DvoFunctions):
 
-    def __init__(self, savepath="~/postage_stamps"):
-        self.savepath = savepath
-        if not path.exists(savepath):
-            subprocess.call('mkdir ' + savepath, shell='True')
+    def __init__(self, path_location=path.expanduser("~") + "/postage_stamps"):
+        self.savepath = path_location
+        if not path.isdir(self.savepath):
+            subprocess.call('mkdir ' + self.savepath, shell='True')
 
-    def _query_postage_stamp(ra, dec, box_size=60, image_dimension=512,
+    def _query_postage_stamp(self, ra, dec, box_size=60, image_dimension=512,
                              system='equatorial'):
         '''
         Query for postage stamp by wrapping through the PS postage stamp
@@ -55,7 +57,7 @@ class postage_stamp(DvoFunctions):
               str(ra) + "%2C+" + str(dec) + "&filter=color&filter=g&" +\
               "filter=r&filter=i&filter=z&filter=y&filetypes=stack&" +\
               "auxiliary=data&size=" + str(image_size) + "&output_size=" +\
-              str(output_size) + "&verbose=0&autoscale=99.500000&catlist="
+              str(box_size) + "&verbose=0&autoscale=99.500000&catlist="
 
         # loading the html script of the given url link
         page = urllib2.urlopen(url)
@@ -71,11 +73,11 @@ class postage_stamp(DvoFunctions):
             text = data[i]
             # extract the html link for the images
             if ((text[:42] == '//ps1images.stsci.edu/cgi-bin/fitscut.cgi?') &
-                (text[-(len(str(output_size))):] == str(output_size))):
+                (text[-(len(str(box_size))):] == str(box_size))):
                 html_links.append('http:' + text)
         return html_links
 
-    def ps_stacked_image(x, y, box_size=60, image_dimension=512,
+    def ps_stacked_image(self, x, y, box_size=60, image_dimension=512,
                          system='equatorial', formatted=True, saved=True,
                          image_format='jpg', display=False, interactive=False):
         '''
@@ -118,10 +120,9 @@ class postage_stamp(DvoFunctions):
         else:
             print "Unknown coordinate system. Please choose between " +\
                   "equatorial galactic (case sensitive)."
-            break
 
         # get the image links
-        html_links = self._query_postage_stamp(x, y, box_size, image_dimension,
+        html_links = self._query_postage_stamp(ra, dec, box_size, image_dimension,
                                                system)
 
         if formatted:
@@ -152,8 +153,8 @@ class postage_stamp(DvoFunctions):
                 ax[2,0].set_xlabel('z')
                 ax[2,1].set_xlabel('y')
             if saved:
-                savefig(savepath + '/postage_stamps/stack_' + ("%f6" % RA) + '_' +\
-                        ("%f6" % DEC) + '.png')
+                savefig(self.savepath + '/stack_' + ("%f6" % ra) + '_' +\
+                        ("%f6" % dec) + '.png')
         else:
             for j in enumerate(html_links):
                 f = imread(urllib2.urlopen(j[1]), format='jpg')
@@ -166,10 +167,12 @@ class postage_stamp(DvoFunctions):
             ion()
         if display:
             show()
+        fig.clf()
+        fig = None
         close()
 
 
-    def query_eopch_postage_stamp(x, y, box_size=60, image_size=512,
+    def query_eopch_postage_stamp(self, x, y, box_size=60, image_size=512,
                                   system='equatorial', formatted=True):
         if system == 'galactic':
             ra, dec = self._galactic_to_equatorial(x, y)
@@ -179,13 +182,12 @@ class postage_stamp(DvoFunctions):
         else:
             print "Unknown coordinate system. Please choose between " +\
                   "equatorial galactic (case sensitive)."
-            break
 
         url = "http://ps1images.stsci.edu/cgi-bin/ps1cutouts?pos=" +\
               str(ra) + "%2C+" + str(dec) + "&filter=color&filter=g&" +\
               "filter=r&filter=i&filter=z&filter=y&filetypes=stack&" +\
               "filetypes=warp&auxiliary=data&size=" + str(image_size) +\
-              "&output_size=" + str(output_size) +
+              "&output_size=" + str(output_size) +\
               "&verbose=0&autoscale=99.500000&catlist="
 
 
