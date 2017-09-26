@@ -4,9 +4,6 @@ import urllib2
 from matplotlib.pyplot import *
 from dvo_functions import DvoFunctions
 
-ra_list = np.array([  54.05807958,   56.12495336,  108.04911823])
-dec_list = np.array([ 18.86069691,  18.84046616,  15.43084874])
-
 class postage_stamp(DvoFunctions):
 
     def __init__(self, path_location=path.expanduser("~") + "/postage_stamps"):
@@ -14,7 +11,7 @@ class postage_stamp(DvoFunctions):
         if not path.isdir(self.savepath):
             subprocess.call('mkdir ' + self.savepath, shell='True')
 
-    def _query_postage_stamp(self, ra, dec, box_size=60, image_dimension=512,
+    def _query_postage_stamp(self, ra, dec, box_size=90, image_dimension=1024,
                              system='equatorial'):
         '''
         Query for postage stamp by wrapping through the PS postage stamp
@@ -77,7 +74,7 @@ class postage_stamp(DvoFunctions):
                 html_links.append('http:' + text)
         return html_links
 
-    def ps_stacked_image(self, x, y, box_size=60, image_dimension=512,
+    def ps_stacked_image(self, x, y, box_size=90, image_dimension=1024,
                          system='equatorial', formatted=True, saved=True,
                          image_format='jpg', display=False, interactive=False):
         '''
@@ -172,7 +169,7 @@ class postage_stamp(DvoFunctions):
         close()
 
 
-    def query_eopch_postage_stamp(self, x, y, box_size=60, image_size=512,
+    def query_eopch_postage_stamp(self, x, y, box_size=90, image_size=1024,
                                   system='equatorial', formatted=True):
         if system == 'galactic':
             ra, dec = self._galactic_to_equatorial(x, y)
@@ -189,8 +186,4 @@ class postage_stamp(DvoFunctions):
               "filetypes=warp&auxiliary=data&size=" + str(image_size) +\
               "&output_size=" + str(output_size) +\
               "&verbose=0&autoscale=99.500000&catlist="
-
-
-
-
 
