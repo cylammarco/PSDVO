@@ -11,7 +11,7 @@ class postage_stamp(DvoFunctions):
         if not path.isdir(self.savepath):
             subprocess.call('mkdir ' + self.savepath, shell='True')
 
-    def _query_postage_stamp(self, ra, dec, box_size=90, image_dimension=1024,
+    def _query_postage_stamp(self, ra, dec, box_size, image_dimension,
                              system='equatorial'):
         '''
         Query for postage stamp by wrapping through the PS postage stamp
@@ -54,7 +54,7 @@ class postage_stamp(DvoFunctions):
               str(ra) + "%2C+" + str(dec) + "&filter=color&filter=g&" +\
               "filter=r&filter=i&filter=z&filter=y&filetypes=stack&" +\
               "auxiliary=data&size=" + str(image_size) + "&output_size=" +\
-              str(box_size) + "&verbose=0&autoscale=99.500000&catlist="
+              str(image_dimension) + "&verbose=0&autoscale=90.000000&catlist="
 
         # loading the html script of the given url link
         page = urllib2.urlopen(url)
@@ -70,13 +70,14 @@ class postage_stamp(DvoFunctions):
             text = data[i]
             # extract the html link for the images
             if ((text[:42] == '//ps1images.stsci.edu/cgi-bin/fitscut.cgi?') &
-                (text[-(len(str(box_size))):] == str(box_size))):
+                (text[-(len(str(image_dimension))):] == str(image_dimension))):
                 html_links.append('http:' + text)
         return html_links
 
-    def ps_stacked_image(self, x, y, box_size=90, image_dimension=1024,
+    def ps_stacked_image(self, x, y, box_size=15, image_dimension=256,
                          system='equatorial', formatted=True, saved=True,
-                         image_format='jpg', display=False, interactive=False):
+                         image_format='jpg', display=False, interactive=False,
+                         unique_name=False):
         '''
         Query for postage stamp by wrapping through the PS postage stamp
         service at http://jflkaslfkalld
@@ -128,7 +129,10 @@ class postage_stamp(DvoFunctions):
             for j in enumerate(html_links):
                 if (j[0]%6 == 0):
                     fig, ax = subplots(3, 2, figsize=(7.5,12))
-                    suptitle(str(ra) + ", " + str(dec) )
+                    if unique_name == False:
+                        suptitle(str(ra) + ", " + str(dec) )
+                    else:
+                    	suptitle(str(unique_name) + " :  " + str(ra) + ", " + str(dec) )
                     tight_layout()
                     n += 1
                 val = (j[0]-n*6)
@@ -150,8 +154,12 @@ class postage_stamp(DvoFunctions):
                 ax[2,0].set_xlabel('z')
                 ax[2,1].set_xlabel('y')
             if saved:
-                savefig(self.savepath + '/stack_' + ("%f6" % ra) + '_' +\
-                        ("%f6" % dec) + '.png')
+                    if unique_name == False:
+                        savefig(self.savepath + '/stack_' + ("%f6" % ra) + '_' +\
+                            ("%f6" % dec) + '.png')
+                    else:
+                        savefig(self.savepath + '/stack_' + unique_name + '_' +\
+                            ("%f6" % ra) + '_' + ("%f6" % dec) + '.png')
         else:
             for j in enumerate(html_links):
                 f = imread(urllib2.urlopen(j[1]), format='jpg')
@@ -169,7 +177,7 @@ class postage_stamp(DvoFunctions):
         close()
 
 
-    def query_eopch_postage_stamp(self, x, y, box_size=90, image_size=1024,
+    def query_eopch_postage_stamp(self, x, y, box_size=15, image_size=256,
                                   system='equatorial', formatted=True):
         if system == 'galactic':
             ra, dec = self._galactic_to_equatorial(x, y)
@@ -185,5 +193,5 @@ class postage_stamp(DvoFunctions):
               "filter=r&filter=i&filter=z&filter=y&filetypes=stack&" +\
               "filetypes=warp&auxiliary=data&size=" + str(image_size) +\
               "&output_size=" + str(output_size) +\
-              "&verbose=0&autoscale=99.500000&catlist="
+              "&verbose=0&autoscale=90.000000&catlist="
 
